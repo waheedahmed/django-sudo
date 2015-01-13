@@ -21,7 +21,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 
-from sudo.settings import REDIRECT_FIELD_NAME, REDIRECT_URL, SUDO_FORM
+from sudo.settings import REDIRECT_FIELD_NAME, REGION_FIELD_NAME, REDIRECT_URL, SUDO_FORM
 from sudo.utils import grant_sudo_privileges
 
 FormPath, FormClass = '.'.join(SUDO_FORM.split('.')[:-1]), SUDO_FORM.split('.')[-1]
@@ -78,17 +78,19 @@ def sudo(request, template_name='sudo/sudo.html', extra_context=None):
     them back to ``next``.
     """
     redirect_to = request.GET.get(REDIRECT_FIELD_NAME, REDIRECT_URL)
+    region = request.GET.get(REGION_FIELD_NAME, None)
+
     # Make sure we're not redirecting to other sites
     if not is_safe_url(url=redirect_to, host=request.get_host()):
         redirect_to = resolve_url(REDIRECT_URL)
 
-    if request.is_sudo():
+    if request.is_sudo(region=region):
         return HttpResponseRedirect(redirect_to)
 
     form = SudoForm(request.user, request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
-            grant_sudo_privileges(request)
+            grant_sudo_privileges(request, region=region)
             return HttpResponseRedirect(redirect_to)
 
     context = {
@@ -100,7 +102,7 @@ def sudo(request, template_name='sudo/sudo.html', extra_context=None):
     return TemplateResponse(request, template_name, context)
 
 
-def redirect_to_sudo(next_url):
+def redirect_to_sudo(next_url, region=None):
     """
     Redirects the user to the login page, passing the given 'next' page
     """
@@ -108,6 +110,8 @@ def redirect_to_sudo(next_url):
 
     querystring = QueryDict(sudo_url_parts[4], mutable=True)
     querystring[REDIRECT_FIELD_NAME] = next_url
+    if region:
+        querystring[REGION_FIELD_NAME] = region
     sudo_url_parts[4] = querystring.urlencode(safe='/')
 
     return HttpResponseRedirect(urlunparse(sudo_url_parts))

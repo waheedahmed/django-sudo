@@ -13,6 +13,9 @@ REDIRECT_URL = getattr(settings, 'SUDO_REDIRECT_URL', '/')
 # The querystring argument to be used for redirection
 REDIRECT_FIELD_NAME = getattr(settings, 'SUDO_REDIRECT_FIELD_NAME', 'next')
 
+# The querystring argument to be used for region specification
+REGION_FIELD_NAME = getattr(settings, 'SUDO_REGION_FIELD_NAME', 'region')
+
 # How long should sudo mode be active for? Duration in seconds.
 COOKIE_AGE = getattr(settings, 'SUDO_COOKIE_AGE', 10800)
 

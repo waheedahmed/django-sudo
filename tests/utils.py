@@ -11,14 +11,14 @@ from .base import BaseTestCase
 
 
 class GrantSudoPrivilegesTestCase(BaseTestCase):
-    def assertRequestHasToken(self, request, max_age):
+    def assertRequestHasToken(self, request, max_age, region=None):
         token = request.session[COOKIE_NAME]
 
         self.assertRegexpMatches(
             token, '^\w{12}$'
         )
         self.assertTrue(request._sudo)
-        self.assertEqual(request._sudo_token, token)
+        self.assertEqual(request._sudo_token[region], token)
         self.assertEqual(request._sudo_max_age, max_age)
 
     def test_grant_token_not_logged_in(self):
@@ -44,8 +44,8 @@ class GrantSudoPrivilegesTestCase(BaseTestCase):
 
 
 class RevokeSudoPrivilegesTestCase(BaseTestCase):
-    def assertRequestNotSudo(self, request):
-        self.assertFalse(self.request._sudo)
+    def assertRequestNotSudo(self, request, region=None):
+        self.assertFalse(self.request._sudo[region])
         self.assertNotIn(COOKIE_NAME, self.request.session)
 
     def test_revoke_sudo_privileges_noop(self):

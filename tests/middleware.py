@@ -40,7 +40,7 @@ class SudoMiddlewareTestCase(BaseTestCase):
         self.assertEqual(morsels[0][0], COOKIE_NAME)
         _, sudo = morsels[0]
         self.assertEqual(sudo.key, COOKIE_NAME)
-        self.assertSignedCookieEqual(sudo.value, self.request._sudo_token)
+        self.assertSignedCookieEqual(sudo.value, self.request._sudo_token[None])
         self.assertEqual(sudo['max-age'], self.request._sudo_max_age)
         self.assertTrue(sudo['httponly'])
 
