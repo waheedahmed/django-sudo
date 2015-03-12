@@ -16,7 +16,7 @@ def cookie_name(region):
     if region is None:
         return COOKIE_NAME
     else:
-        return '%s-%s' % (COOKIE_NAME, region)
+        return str('%s-%s' % (COOKIE_NAME, region.replace('/', '-')))
 
 def setup_request(request):
 
@@ -71,11 +71,17 @@ def has_sudo_privileges(request, region=None):
 
     if request._sudo[region] is None:
         try:
+            token = request.get_signed_cookie(
+                cookie_name(region),
+                salt=COOKIE_SALT,
+                max_age=COOKIE_AGE
+            )
             request._sudo[region] = (
                 request.user.is_authenticated() and
-                request.get_signed_cookie(cookie_name(region), salt=COOKIE_SALT, max_age=COOKIE_AGE) ==
-                request.session[cookie_name(region)]
+                token == request.session[cookie_name(region)]
             )
+            request._sudo_token[region] = token
+            request._sudo_max_age = COOKIE_AGE
         except (KeyError, BadSignature):
             request._sudo[region] = False
     return request._sudo[region]
