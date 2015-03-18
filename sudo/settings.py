@@ -44,3 +44,6 @@ COOKIE_SALT = getattr(settings, 'SUDO_COOKIE_SALT', '')
 # The form to use within the ``sudo`` view. Override if you want to add
 # additional fields or different behavior.
 SUDO_FORM = getattr(settings, 'SUDO_FORM', 'sudo.forms.SudoForm')
+
+# Provide new sudo token content on activity and reset timeout if True.
+RESET_TOKEN = getattr(settings, 'RESET_TOKEN', False)

@@ -49,7 +49,7 @@ class SudoMiddleware(object):
 
             # Sudo mode has been granted,
             # and we have a token to send back to the user agent
-            if sudo_enabled is True and hasattr(request, '_sudo_token'):
+            if sudo_enabled is True and hasattr(request, '_sudo_token') and region in request._sudo_token:
                 token = request._sudo_token[region]
                 max_age = request._sudo_max_age
                 response.set_signed_cookie(

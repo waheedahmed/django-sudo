@@ -80,8 +80,18 @@ def has_sudo_privileges(request, region=None):
                 request.user.is_authenticated() and
                 token == request.session[cookie_name(region)]
             )
-            request._sudo_token[region] = token
-            request._sudo_max_age = COOKIE_AGE
         except (KeyError, BadSignature):
             request._sudo[region] = False
     return request._sudo[region]
+
+def new_sudo_token_on_activity(request, region=None):
+    """
+    Provide new sudo token content on activity and reset timeout.
+    """
+
+    token = get_random_string()
+
+    setup_request(request)
+    request.session[cookie_name(region)] = token
+    request._sudo_token[region] = token
+    request._sudo_max_age = COOKIE_AGE

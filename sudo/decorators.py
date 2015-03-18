@@ -7,6 +7,8 @@ sudo.decorators
 """
 from functools import wraps
 
+from sudo.settings import RESET_TOKEN
+from sudo.utils import new_sudo_token_on_activity
 from sudo.views import redirect_to_sudo
 
 
@@ -32,6 +34,11 @@ def sudo_required(func_or_region):
             # N.B. region is captured from the enclosing sudo_required function
             if not request.is_sudo(region=region):
                 return redirect_to_sudo(request.get_full_path(), region=region)
+
+            if RESET_TOKEN is True:
+                # Provide new sudo token content and reset timeout on activity
+                new_sudo_token_on_activity(request, region=region)
+
             return func(request, *args, **kwargs)
         return inner
 
