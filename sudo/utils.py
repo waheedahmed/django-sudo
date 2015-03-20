@@ -16,7 +16,7 @@ def cookie_name(region):
     if region is None:
         return COOKIE_NAME
     else:
-        return str('%s-%s' % (COOKIE_NAME, region.replace('/', '-')))
+        return str('%s-%s' % (COOKIE_NAME, region))
 
 def setup_request(request):
 
