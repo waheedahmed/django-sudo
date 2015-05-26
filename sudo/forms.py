@@ -19,6 +19,7 @@ class SudoForm(forms.Form):
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super(SudoForm, self).__init__(*args, **kwargs)
+        self.fields['password'].widget.attrs.update({'autofocus': 'autofocus'})
 
     def clean_password(self):
         if auth.authenticate(username=self.user.username,
